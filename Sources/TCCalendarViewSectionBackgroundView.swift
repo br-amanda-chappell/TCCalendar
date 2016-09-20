@@ -34,11 +34,11 @@ class TCCalendarViewSectionBackgroundView: UICollectionReusableView {
     }
 
     func initialize() {
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
 
         monthLabel = UILabel(frame: self.bounds)
-        monthLabel.textAlignment = .Left
-        monthLabel.font = UIFont.boldSystemFontOfSize(108)
+        monthLabel.textAlignment = .left
+        monthLabel.font = UIFont.boldSystemFont(ofSize: 108)
         monthLabel.alpha = 0.1
         monthLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(monthLabel)
@@ -53,8 +53,8 @@ class TCCalendarViewSectionBackgroundView: UICollectionReusableView {
         let offsetVertical = contentOffset.vertical ?? 0
 
         let views = ["monthLabel": monthLabel]
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-(\(offsetHorizontal))-[monthLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-(\(offsetVertical))-[monthLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-(\(offsetHorizontal))-[monthLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-(\(offsetVertical))-[monthLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
     }
 
     override init(frame: CGRect) {
@@ -71,19 +71,19 @@ class TCCalendarViewSectionBackgroundView: UICollectionReusableView {
 }
 
 extension TCCalendarViewSectionBackgroundView {
-    dynamic func setFont(font: UIFont) {
+    dynamic func setFont(_ font: UIFont) {
         self.monthLabel?.font = font
     }
 
-    dynamic func setTextColor(color: UIColor) {
+    dynamic func setTextColor(_ color: UIColor) {
         self.monthLabel?.textColor = color
     }
 
-    dynamic func setTextAlpha(alpha: CGFloat) {
+    dynamic func setTextAlpha(_ alpha: CGFloat) {
         self.monthLabel?.alpha = alpha
     }
 
-    dynamic func setTextOffset(offset: UIOffset) {
+    dynamic func setTextOffset(_ offset: UIOffset) {
         self.contentOffset = offset
     }
 }

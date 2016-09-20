@@ -28,7 +28,7 @@ import UIKit
 class TCCalendarMonthTitleView: UICollectionReusableView {
     var titleLabel: UILabel!
 
-    var separatorLineColor: UIColor = UIColor.blackColor()
+    var separatorLineColor: UIColor = UIColor.black
     var drawSeparatorLine: Bool = true {
         didSet {
             self.setNeedsDisplay()
@@ -42,20 +42,20 @@ class TCCalendarMonthTitleView: UICollectionReusableView {
     }
     
     func initialize() {
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
 
         initTitleLabel()
     }
 
-    private func initTitleLabel() {
+    fileprivate func initTitleLabel() {
         titleLabel = UILabel(frame: self.bounds)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         self.addSubview(titleLabel)
 
         let views = ["titleLabel": titleLabel]
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-15-[titleLabel]-15-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-18-[titleLabel]-0-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[titleLabel]-15-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-18-[titleLabel]-0-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
     }
 
     override init(frame: CGRect) {
@@ -70,31 +70,31 @@ class TCCalendarMonthTitleView: UICollectionReusableView {
         initialize()
     }
 
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         guard drawSeparatorLine else { return }
 
         let context = UIGraphicsGetCurrentContext()
 
-        CGContextSetAllowsAntialiasing(context, false)
-        CGContextSetStrokeColorWithColor(context, separatorLineColor.CGColor)
-        CGContextSetLineWidth(context, 1.0)
-        CGContextMoveToPoint(context, 0.0, 0.0)
-        CGContextAddLineToPoint(context, self.bounds.width, 0.0)
-        CGContextStrokePath(context)
-        CGContextSetAllowsAntialiasing(context, true)
+        context?.setAllowsAntialiasing(false)
+        context?.setStrokeColor(separatorLineColor.cgColor)
+        context?.setLineWidth(1.0)
+        context?.move(to: CGPoint(x: 0.0, y: 0.0))
+        context?.addLine(to: CGPoint(x: self.bounds.width, y: 0.0))
+        context?.strokePath()
+        context?.setAllowsAntialiasing(true)
     }
 }
 
 extension TCCalendarMonthTitleView {
-    dynamic func setFont(font: UIFont) {
+    dynamic func setFont(_ font: UIFont) {
         self.titleLabel?.font = font
     }
 
-    dynamic func setTextColor(color: UIColor) {
+    dynamic func setTextColor(_ color: UIColor) {
         self.titleLabel?.textColor = color
     }
 
-    dynamic func setSeparatorColor(color: UIColor) {
+    dynamic func setSeparatorColor(_ color: UIColor) {
         separatorLineColor = color
     }
 }

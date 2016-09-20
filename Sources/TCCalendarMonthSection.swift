@@ -26,8 +26,8 @@
 import UIKit
 
 class TCCalendarMonthSection: TCCalendarSection {
-    var month: NSDate
-    var calendar: NSCalendar
+    var month: Date
+    var calendar: Calendar
     var numberOfDaysInWeek: Int = 7
 
     var weekdayOfFirstDay: Int
@@ -41,12 +41,12 @@ class TCCalendarMonthSection: TCCalendarSection {
         return true
     }
 
-    init(month: NSDate, calendar: NSCalendar, numberOfDaysInWeek: Int) {
+    init(month: Date, calendar: Calendar, numberOfDaysInWeek: Int) {
         self.month = month
         self.calendar = calendar
         self.numberOfDaysInWeek = numberOfDaysInWeek
 
-        let weekdayComponents = calendar.components(.Weekday, fromDate: month)
-        self.weekdayOfFirstDay = weekdayComponents.weekday - 1
+        let weekdayComponents = (calendar as NSCalendar).components(.weekday, from: month)
+        self.weekdayOfFirstDay = weekdayComponents.weekday! - 1
     }
 }

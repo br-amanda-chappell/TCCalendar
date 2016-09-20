@@ -34,12 +34,12 @@ class TCCalendarSupplementarySectionView: UICollectionReusableView {
         }
     }
 
-    func showSupplementaryView(view: UIView, offset: UIOffset) {
+    func showSupplementaryView(_ view: UIView, offset: UIOffset) {
         view.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(view)
 
         let views = ["supplementaryView": view]
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-\(offset.horizontal)-[supplementaryView]-0-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-\(offset.vertical)-[supplementaryView]-0-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-\(offset.horizontal)-[supplementaryView]-0-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-\(offset.vertical)-[supplementaryView]-0-|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
     }
 }

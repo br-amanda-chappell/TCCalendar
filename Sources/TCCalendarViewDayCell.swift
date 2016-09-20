@@ -27,7 +27,7 @@ import UIKit
 
 class TCCalendarViewDayCell: UICollectionViewCell {
     var dayLabel: UILabel!
-    var date: NSDate! {
+    var date: Date! {
         didSet {
             self.dayLabel?.text = self.date?.dayString ?? ""
         }
@@ -39,24 +39,24 @@ class TCCalendarViewDayCell: UICollectionViewCell {
         reset()
     }
     
-    private func reset() {
+    fileprivate func reset() {
         date = nil
         backgroundView = nil
         
         dayLabel.text = ""
-        dayLabel.textColor = UIColor.blackColor()
-        dayLabel.font = UIFont.systemFontOfSize(18)
+        dayLabel.textColor = UIColor.black
+        dayLabel.font = UIFont.systemFont(ofSize: 18)
     }
     
-    private func addDayLabel() {
+    fileprivate func addDayLabel() {
         dayLabel = UILabel(frame: self.bounds)
-        dayLabel.textAlignment = .Center
+        dayLabel.textAlignment = .center
         dayLabel.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(dayLabel)
         
         let views = ["dayLabel": dayLabel]
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
     }
 
     func initialize() {

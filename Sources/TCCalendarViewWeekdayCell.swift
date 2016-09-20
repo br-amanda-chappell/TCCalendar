@@ -34,21 +34,21 @@ class TCCalendarViewWeekdayCell: UICollectionViewCell {
         reset()
     }
     
-    private func reset() {
+    fileprivate func reset() {
         backgroundView = nil
         
         weekdayLabel.text = ""
     }
     
-    private func addDayLabel() {
+    fileprivate func addDayLabel() {
         weekdayLabel = UILabel(frame: self.bounds)
-        weekdayLabel.textAlignment = .Center
+        weekdayLabel.textAlignment = .center
         weekdayLabel.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(weekdayLabel)
         
         let views = ["dayLabel": weekdayLabel]
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[dayLabel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
     }
     
     func initialize() {
@@ -70,11 +70,11 @@ class TCCalendarViewWeekdayCell: UICollectionViewCell {
 }
 
 extension TCCalendarViewWeekdayCell {
-    dynamic func setFont(font: UIFont) {
+    dynamic func setFont(_ font: UIFont) {
         self.weekdayLabel?.font = font
     }
 
-    dynamic func setTextColor(color: UIColor) {
+    dynamic func setTextColor(_ color: UIColor) {
         self.weekdayLabel?.textColor = color
     }
 }

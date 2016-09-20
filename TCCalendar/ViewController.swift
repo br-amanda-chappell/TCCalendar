@@ -29,73 +29,73 @@ class ViewController: UIViewController {
 
     @IBOutlet var calendarView: TCCalendarView!
     
-    var startDate: NSDate?
-    var endDate: NSDate?
+    var startDate: Date?
+    var endDate: Date?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        TCCalendarMonthTitleView.appearance().setFont(UIFont.boldSystemFontOfSize(20))
-        TCCalendarMonthTitleView.appearance().setTextColor(UIColor.blueColor())
-        TCCalendarMonthTitleView.appearance().setSeparatorColor(UIColor.redColor())
+        TCCalendarMonthTitleView.appearance().setFont(UIFont.boldSystemFont(ofSize: 20))
+        TCCalendarMonthTitleView.appearance().setTextColor(UIColor.blue)
+        TCCalendarMonthTitleView.appearance().setSeparatorColor(UIColor.red)
 
-        TCCalendarViewSectionBackgroundView.appearance().setTextColor(UIColor.yellowColor())
+        TCCalendarViewSectionBackgroundView.appearance().setTextColor(UIColor.yellow)
 
-        TCCalendarViewWeekdayCell.appearance().setFont(UIFont.boldSystemFontOfSize(12))
-        TCCalendarViewWeekdayCell.appearance().setTextColor(UIColor.orangeColor())
+        TCCalendarViewWeekdayCell.appearance().setFont(UIFont.boldSystemFont(ofSize: 12))
+        TCCalendarViewWeekdayCell.appearance().setTextColor(UIColor.orange)
 
-        calendarView.fromDate = NSDate()
-        calendarView.toDate = NSDate(timeIntervalSinceNow: 60 * 60 * 24 * 180)
+        calendarView.fromDate = Date()
+        calendarView.toDate = Date(timeIntervalSinceNow: 60 * 60 * 24 * 180)
 
-        let headerLabel = UILabel(frame: CGRectMake(0.0, 0.0, 0.0, 100.0))
-        headerLabel.font = UIFont.italicSystemFontOfSize(UIFont.systemFontSize())
+        let headerLabel = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 100.0))
+        headerLabel.font = UIFont.italicSystemFont(ofSize: UIFont.systemFontSize)
         headerLabel.text = "Calendar Header"
         calendarView.headerView = headerLabel
 
-        let footerLabel = UILabel(frame: CGRectMake(0.0, 0.0, 0.0, 50.0))
-        footerLabel.font = UIFont.italicSystemFontOfSize(UIFont.systemFontSize())
+        let footerLabel = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 50.0))
+        footerLabel.font = UIFont.italicSystemFont(ofSize: UIFont.systemFontSize)
         footerLabel.text = "Calendar Footer"
         calendarView.footerView = footerLabel
 
         calendarView.cellDecorateClosure = { cell, calendar, isEnabled in
             if !isEnabled {
-                cell.dayLabel.textColor = UIColor.lightGrayColor()
+                cell.dayLabel.textColor = UIColor.lightGray
                 return
             }
             
-            var color: UIColor = UIColor.clearColor()
+            var color: UIColor = UIColor.clear
             
             if let startDate = self.startDate {
                 if cell.date == startDate {
-                    color = UIColor.orangeColor()
+                    color = UIColor.orange
                 }
 
                 if let endDate = self.endDate {
                     if cell.date == endDate {
                         if startDate == endDate {
-                            color = UIColor.purpleColor()
+                            color = UIColor.purple
                         } else {
-                            color = UIColor.blueColor()
+                            color = UIColor.blue
                         }
-                    } else if cell.date.compare(startDate) == .OrderedDescending && cell.date.compare(endDate) == .OrderedAscending {
-                        color = UIColor.grayColor()
+                    } else if cell.date.compare(startDate) == .orderedDescending && cell.date.compare(endDate) == .orderedAscending {
+                        color = UIColor.gray
                     }
                 }
             }
 
-            if cell.date.compareWithoutTime(NSDate(), inCalendar: calendar) == .OrderedSame {
-                cell.dayLabel.font = UIFont.boldSystemFontOfSize(18)
+            if cell.date.compareWithoutTime(Date(), inCalendar: calendar) == .orderedSame {
+                cell.dayLabel.font = UIFont.boldSystemFont(ofSize: 18)
             }
 
             let view = UIView(frame: cell.bounds)
             view.backgroundColor = color
             cell.backgroundView = view
             
-            cell.dayLabel.textColor = UIColor.blackColor()
+            cell.dayLabel.textColor = UIColor.black
         }
 
         calendarView.shouldEnableDateClosure = { date, calendar in
-            return date.compareWithoutTime(NSDate(), inCalendar: calendar) != NSComparisonResult.OrderedAscending
+            return date.compareWithoutTime(Date(), inCalendar: calendar) != ComparisonResult.orderedAscending
         }
 //
 //        calendarView.shouldSelectDateClosure = { date, calendar in
@@ -105,17 +105,17 @@ class ViewController: UIViewController {
         calendarView.didSelectDateClosure = { date, calendar in
             if let startDate = self.startDate {
                 if self.endDate == nil {
-                    if date.compareWithoutTime(startDate, inCalendar: calendar) == NSComparisonResult.OrderedAscending {
-                        self.startDate = date
+                    if date.compareWithoutTime(startDate, inCalendar: calendar) == ComparisonResult.orderedAscending {
+                        self.startDate = date as Date
                     } else {
-                        self.endDate = date
+                        self.endDate = date as Date
                     }
                 } else {
-                    self.startDate = date
+                    self.startDate = date as Date
                     self.endDate = nil
                 }
             } else {
-                self.startDate = date
+                self.startDate = date as Date
             }
             
             self.calendarView.reloadData()

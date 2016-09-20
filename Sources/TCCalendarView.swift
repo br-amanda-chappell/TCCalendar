@@ -42,13 +42,13 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
     var weekdaySymbols: [String]!
     var numberOfDaysInWeek: Int = 7
 
-    var calendar: NSCalendar!
+    var calendar: Calendar!
 
-    var shouldEnableDateClosure: ((date: NSDate, calendar: NSCalendar) -> (Bool))?
-    var shouldSelectDateClosure: ((date: NSDate, calendar: NSCalendar) -> (Bool))?
-    var didSelectDateClosure: ((date: NSDate, calendar: NSCalendar) -> ())?
+    var shouldEnableDateClosure: ((_ date: Date, _ calendar: Calendar) -> (Bool))?
+    var shouldSelectDateClosure: ((_ date: Date, _ calendar: Calendar) -> (Bool))?
+    var didSelectDateClosure: ((_ date: Date, _ calendar: Calendar) -> ())?
 
-    var cellDecorateClosure: ((cell: TCCalendarViewDayCell, calendar: NSCalendar, isEnabled: Bool) -> ())?
+    var cellDecorateClosure: ((_ cell: TCCalendarViewDayCell, _ calendar: Calendar, _ isEnabled: Bool) -> ())?
 
     var headerView: UIView? {
         didSet {
@@ -62,21 +62,21 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
         }
     }
 
-    var fromDate: NSDate! {
+    var fromDate: Date! {
         didSet {
             updateData()
         }
     }
 
-    var toDate: NSDate! {
+    var toDate: Date! {
         didSet {
             updateData()
         }
     }
 
-    private func updateData() {
+    fileprivate func updateData() {
         if fromDate != nil && toDate != nil {
-            sections.removeAll(keepCapacity: true)
+            sections.removeAll(keepingCapacity: true)
 
             if let headerView = headerView {
                 sections.append(TCCalendarSupplementarySection(view: headerView))
@@ -84,7 +84,7 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
 
             var dateForMonth = fromDate.firstDateOfMonth(inCalendar: calendar)
 
-            let monthComponents = NSDateComponents()
+            var monthComponents = DateComponents()
             monthComponents.month = 1
 
             var section = TCCalendarMonthSection(month: dateForMonth, calendar: calendar, numberOfDaysInWeek: numberOfDaysInWeek)
@@ -93,10 +93,10 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
             repeat {
                 sections.append(section)
 
-                dateForMonth = calendar.dateByAddingComponents(monthComponents, toDate: dateForMonth, options: NSCalendarOptions())!
+                dateForMonth = calendar.date(byAdding: monthComponents, to: dateForMonth, wrappingComponents: false)!
 
                 section = TCCalendarMonthSection(month: dateForMonth, calendar: calendar, numberOfDaysInWeek: numberOfDaysInWeek)
-            } while(dateForMonth.compare(toDate) != NSComparisonResult.OrderedDescending)
+            } while(dateForMonth.compare(toDate) != ComparisonResult.orderedDescending)
 
             if let footerView = footerView {
                 sections.append(TCCalendarSupplementarySection(view: footerView))
@@ -107,21 +107,21 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
     }
 
     func registerClasses() {
-        self.registerClass(TCCalendarViewDayCell.self, forCellWithReuseIdentifier: TCCalendarViewDayCellIdentifier)
-        self.registerClass(TCCalendarViewWeekdayCell.self, forCellWithReuseIdentifier: TCCalendarViewWeekdayCellIdentifier)
+        self.register(TCCalendarViewDayCell.self, forCellWithReuseIdentifier: TCCalendarViewDayCellIdentifier)
+        self.register(TCCalendarViewWeekdayCell.self, forCellWithReuseIdentifier: TCCalendarViewWeekdayCellIdentifier)
 
-        self.registerClass(TCCalendarMonthTitleView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: TCCalendarMonthTitleViewIdentifier)
-        self.registerClass(TCCalendarViewSectionBackgroundView.self, forSupplementaryViewOfKind: TCCalendarViewSectionBackgroundKind, withReuseIdentifier: TCCalendarViewSectionBackgroundViewIdentifier)
+        self.register(TCCalendarMonthTitleView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: TCCalendarMonthTitleViewIdentifier)
+        self.register(TCCalendarViewSectionBackgroundView.self, forSupplementaryViewOfKind: TCCalendarViewSectionBackgroundKind, withReuseIdentifier: TCCalendarViewSectionBackgroundViewIdentifier)
 
-        self.registerClass(TCCalendarSupplementarySectionView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: TCCalendarSupplementarySectionViewIdentifier)
+        self.register(TCCalendarSupplementarySectionView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: TCCalendarSupplementarySectionViewIdentifier)
     }
 
     func initialize() {
         registerClasses()
 
-        self.calendar = NSCalendar.currentCalendar()
+        self.calendar = Calendar.current
 
-        let formatter = NSDateFormatter()
+        let formatter = DateFormatter()
         formatter.calendar = self.calendar
         self.weekdaySymbols = formatter.veryShortWeekdaySymbols as [String]
         self.numberOfDaysInWeek = self.weekdaySymbols.count
@@ -130,10 +130,10 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
         self.delegate = self
 
         self.collectionViewLayout = TCCalendarLayout()
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
 
-        self.fromDate = NSDate()
-        self.toDate = NSDate().dateByAddingTimeInterval(60 * 60 * 24 * 365)
+        self.fromDate = Date()
+        self.toDate = Date().addingTimeInterval(60 * 60 * 24 * 365)
     }
 
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
@@ -148,84 +148,84 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
         initialize()
     }
 
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }
 
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return sections[section].numberOfItems
     }
 
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        if indexPath.item < numberOfDaysInWeek {
-            let cell = collectionView.dequeueReusableCellWithReuseIdentifier(TCCalendarViewWeekdayCellIdentifier, forIndexPath: indexPath) as! TCCalendarViewWeekdayCell
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if (indexPath as NSIndexPath).item < numberOfDaysInWeek {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TCCalendarViewWeekdayCellIdentifier, for: indexPath) as! TCCalendarViewWeekdayCell
 
-            cell.weekdayLabel.text = weekdaySymbols[indexPath.item]
+            cell.weekdayLabel.text = weekdaySymbols[(indexPath as NSIndexPath).item]
             return cell
         } else {
-            let cell = collectionView.dequeueReusableCellWithReuseIdentifier(TCCalendarViewDayCellIdentifier, forIndexPath: indexPath) as! TCCalendarViewDayCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TCCalendarViewDayCellIdentifier, for: indexPath) as! TCCalendarViewDayCell
 
-            let monthSection = sections[indexPath.section] as! TCCalendarMonthSection
+            let monthSection = sections[(indexPath as NSIndexPath).section] as! TCCalendarMonthSection
 
             let weekday = monthSection.weekdayOfFirstDay
-            if indexPath.item >= weekday + numberOfDaysInWeek {
-                let day = indexPath.item - weekday - numberOfDaysInWeek + 1
+            if (indexPath as NSIndexPath).item >= weekday + numberOfDaysInWeek {
+                let day = (indexPath as NSIndexPath).item - weekday - numberOfDaysInWeek + 1
 
                 let month = monthSection.month
-                let components = calendar.components([.Year, .Month], fromDate: month)
+                var components = calendar.dateComponents([.year, .month], from: month as Date)
                 components.day = day
 
-                let realDate = calendar.dateFromComponents(components)!
+                let realDate = calendar.date(from: components)!
 
                 cell.date = realDate
 
-                cellDecorateClosure?(cell: cell, calendar: calendar, isEnabled: shouldEnableDate(realDate))
+                cellDecorateClosure?(cell, calendar, shouldEnableDate(realDate))
             }
 
             return cell
         }
     }
 
-    private func shouldEnableDate(date: NSDate) -> Bool {
-        guard date.compareWithoutTime(self.fromDate, inCalendar: calendar) != .OrderedAscending else { return false }
-        guard date.compareWithoutTime(self.toDate, inCalendar: calendar) != .OrderedDescending else { return false }
+    fileprivate func shouldEnableDate(_ date: Date) -> Bool {
+        guard date.compareWithoutTime(self.fromDate, inCalendar: calendar) != .orderedAscending else { return false }
+        guard date.compareWithoutTime(self.toDate, inCalendar: calendar) != .orderedDescending else { return false }
 
-        return self.shouldEnableDateClosure?(date: date, calendar: calendar) ?? true
+        return self.shouldEnableDateClosure?(date, calendar) ?? true
     }
 
-    func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        let monthSection = sections[indexPath.section] as! TCCalendarMonthSection
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        let monthSection = sections[(indexPath as NSIndexPath).section] as! TCCalendarMonthSection
 
         let weekday = monthSection.weekdayOfFirstDay
-        if indexPath.item < weekday + numberOfDaysInWeek {
+        if (indexPath as NSIndexPath).item < weekday + numberOfDaysInWeek {
             return false
         }
 
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! TCCalendarViewDayCell
+        let cell = collectionView.cellForItem(at: indexPath) as! TCCalendarViewDayCell
         var result = true
 
-        result = result && shouldEnableDate(cell.date)
-        result = result && (shouldSelectDateClosure?(date: cell.date, calendar: calendar) ?? true)
+        result = result && shouldEnableDate(cell.date as Date)
+        result = result && (shouldSelectDateClosure?(cell.date as Date, calendar) ?? true)
 
         return result
     }
 
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! TCCalendarViewDayCell
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath) as! TCCalendarViewDayCell
 
-        didSelectDateClosure?(date: cell.date, calendar: calendar)
+        didSelectDateClosure?(cell.date as Date, calendar)
     }
 
-    func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
-        if let monthSection = sections[indexPath.section] as? TCCalendarMonthSection {
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if let monthSection = sections[(indexPath as NSIndexPath).section] as? TCCalendarMonthSection {
             if kind == UICollectionElementKindSectionHeader {
-                let titleView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: TCCalendarMonthTitleViewIdentifier, forIndexPath: indexPath) as! TCCalendarMonthTitleView
+                let titleView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TCCalendarMonthTitleViewIdentifier, for: indexPath) as! TCCalendarMonthTitleView
                 titleView.titleLabel.text = monthSection.month.longMonthString
                 titleView.drawSeparatorLine = monthSection.drawSeparatorLine
 
                 return titleView
             } else {
-                let bgView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: TCCalendarViewSectionBackgroundViewIdentifier, forIndexPath: indexPath) as! TCCalendarViewSectionBackgroundView
+                let bgView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TCCalendarViewSectionBackgroundViewIdentifier, for: indexPath) as! TCCalendarViewSectionBackgroundView
 
                 bgView.monthLabel.text = monthSection.month.shortMonthString
                 bgView.monthLabel.sizeToFit()
@@ -234,9 +234,9 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
                 return bgView
             }
         } else {
-            let view = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: TCCalendarSupplementarySectionViewIdentifier, forIndexPath: indexPath) as! TCCalendarSupplementarySectionView
+            let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TCCalendarSupplementarySectionViewIdentifier, for: indexPath) as! TCCalendarSupplementarySectionView
 
-            if let section = sections[indexPath.section] as? TCCalendarSupplementarySection {
+            if let section = sections[(indexPath as NSIndexPath).section] as? TCCalendarSupplementarySection {
                 view.showSupplementaryView(section.view, offset: section.offset)
             }
 
@@ -244,7 +244,7 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
         }
     }
 
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let width = self.bounds.width
         let itemWidth = floor(width / CGFloat(numberOfDaysInWeek))
@@ -254,14 +254,14 @@ class TCCalendarView: UICollectionView, UICollectionViewDelegate, UICollectionVi
         let halfMiss = floor(miss / 2.0)
         let missRemains = miss - halfMiss * 2.0
 
-        let itemColumnIndex = indexPath.item % numberOfDaysInWeek
+        let itemColumnIndex = (indexPath as NSIndexPath).item % numberOfDaysInWeek
 
         let widthFix = (itemColumnIndex == 0 || itemColumnIndex == numberOfDaysInWeek - 1) ? halfMiss : ((itemColumnIndex == numberOfDaysInWeek / 2) ? missRemains : 0)
 
-        return CGSizeMake(itemWidth + widthFix, itemHeight)
+        return CGSize(width: itemWidth + widthFix, height: itemHeight)
     }
 
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSizeMake(0.0, sections[section].headerHeight)
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: 0.0, height: sections[section].headerHeight)
     }
 }

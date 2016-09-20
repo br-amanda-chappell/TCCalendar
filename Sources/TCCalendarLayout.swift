@@ -28,24 +28,24 @@ import UIKit
 class TCCalendarLayout: UICollectionViewFlowLayout {
     var backgroundViewReferenceSize: CGSize!
 
-    override func prepareLayout() {
-        super.prepareLayout()
+    override func prepare() {
+        super.prepare()
 
         self.minimumInteritemSpacing = 0.0
         self.minimumLineSpacing = 0.0
-        self.headerReferenceSize = CGSizeMake(0.0, 44.0)
-        self.footerReferenceSize = CGSizeZero
-        self.backgroundViewReferenceSize = CGSizeMake(0.0, 130.0)
+        self.headerReferenceSize = CGSize(width: 0.0, height: 44.0)
+        self.footerReferenceSize = CGSize.zero
+        self.backgroundViewReferenceSize = CGSize(width: 0.0, height: 130.0)
     }
 
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        var attributes = super.layoutAttributesForElementsInRect(rect)!
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        var attributes = super.layoutAttributesForElements(in: rect)!
         let calendarView = self.collectionView as! TCCalendarView
 
         var sections = Set<UICollectionViewLayoutAttributes>()
         for attribute in attributes {
-            if attribute.representedElementCategory == .SupplementaryView && attribute.representedElementKind == UICollectionElementKindSectionHeader {
-                guard calendarView.sections[attribute.indexPath.section].hasDecorationView else { continue }
+            if attribute.representedElementCategory == .supplementaryView && attribute.representedElementKind == UICollectionElementKindSectionHeader {
+                guard calendarView.sections[(attribute.indexPath as NSIndexPath).section].hasDecorationView else { continue }
 
                 sections.insert(attribute)
             }
@@ -54,14 +54,14 @@ class TCCalendarLayout: UICollectionViewFlowLayout {
         for attribute in sections {
             let indexPath = attribute.indexPath
 
-            guard calendarView.sections[indexPath.section].hasDecorationView else { continue }
+            guard calendarView.sections[(indexPath as NSIndexPath).section].hasDecorationView else { continue }
 
-            let bgAttribute = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: TCCalendarViewSectionBackgroundKind, withIndexPath: indexPath)
+            let bgAttribute = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: TCCalendarViewSectionBackgroundKind, with: indexPath)
 
             let bgWidth = self.backgroundViewReferenceSize.width == 0 ? self.collectionView!.frame.width : self.backgroundViewReferenceSize.width
             let bgHeight = self.backgroundViewReferenceSize.height
             
-            bgAttribute.frame = CGRectMake(0.0, attribute.frame.origin.y + attribute.frame.height, bgWidth, bgHeight)
+            bgAttribute.frame = CGRect(x: 0.0, y: attribute.frame.origin.y + attribute.frame.height, width: bgWidth, height: bgHeight)
             bgAttribute.zIndex = -10
 
             attributes.append(bgAttribute)

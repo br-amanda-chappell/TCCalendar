@@ -25,54 +25,58 @@
 
 import UIKit
 
-extension NSDate {
-    func firstDateOfMonth(inCalendar calendar: NSCalendar) -> NSDate {
-        let components = calendar.components([.Year, .Month, .Day], fromDate: self)
+extension Date {
+    func firstDateOfMonth(inCalendar calendar: Calendar) -> Date {
+        var components = (calendar as NSCalendar).components([.year, .month, .day], from: self)
 
         components.day = 1
 
-        return calendar.dateFromComponents(components)!
+        return calendar.date(from: components)!
     }
 
-    func lastDateOfMonth(inCalendar calendar: NSCalendar) -> NSDate {
-        let components = calendar.components([.Year, .Month, .Day], fromDate: self)
+    func lastDateOfMonth(inCalendar calendar: Calendar) -> Date {
+        var components = (calendar as NSCalendar).components([.year, .month, .day], from: self)
 
         components.day = 0
-        components.month += 1
+        if let month = components.month {
+            components.month = month + 1
+        } else {
+            components.month = 1
+        }
 
-        return calendar.dateFromComponents(components)!
+        return calendar.date(from: components)!
     }
 
-    func daysOfMonth(inCalendar calendar: NSCalendar) -> Int {
-        let components = calendar.components(.Day, fromDate: self.firstDateOfMonth(inCalendar: calendar), toDate: self.lastDateOfMonth(inCalendar: calendar), options: [])
+    func daysOfMonth(inCalendar calendar: Calendar) -> Int {
+        let components = (calendar as NSCalendar).components(.day, from: self.firstDateOfMonth(inCalendar: calendar), to: self.lastDateOfMonth(inCalendar: calendar), options: [])
 
-        return components.day + 1
+        return components.day! + 1
     }
 
     var longMonthString: String {
-        let formatter = NSDateFormatter()
+        let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
-        return formatter.stringFromDate(self)
+        return formatter.string(from: self)
     }
 
     var shortMonthString: String {
-        let formatter = NSDateFormatter()
+        let formatter = DateFormatter()
         formatter.dateFormat = "MMM"
-        return formatter.stringFromDate(self)
+        return formatter.string(from: self)
     }
 
     var dayString: String {
-        let formatter = NSDateFormatter()
+        let formatter = DateFormatter()
         formatter.dateFormat = "d"
-        return formatter.stringFromDate(self)
+        return formatter.string(from: self)
     }
 
-    func compareWithoutTime(anotherDate: NSDate, inCalendar calendar: NSCalendar) -> NSComparisonResult {
-        let components = calendar.components([.Year, .Month, .Day], fromDate: self)
-        let anotherComponents = calendar.components([.Year, .Month, .Day], fromDate: anotherDate)
+    func compareWithoutTime(_ anotherDate: Date, inCalendar calendar: Calendar) -> ComparisonResult {
+        let components = (calendar as NSCalendar).components([.year, .month, .day], from: self)
+        let anotherComponents = (calendar as NSCalendar).components([.year, .month, .day], from: anotherDate)
 
-        let dateOnly = calendar.dateFromComponents(components)!
-        let anotherDateOnly = calendar.dateFromComponents(anotherComponents)!
+        let dateOnly = calendar.date(from: components)!
+        let anotherDateOnly = calendar.date(from: anotherComponents)!
 
         return dateOnly.compare(anotherDateOnly)
     }
